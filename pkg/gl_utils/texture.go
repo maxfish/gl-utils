@@ -1,16 +1,16 @@
 package gl_utils
 
 import (
-"fmt"
-"image"
-"image/draw"
-"os"
-// Used only to initialize the JPEG subsystem
-_ "image/jpeg"
-// Used only to initialize the PNG subsystem
-_ "image/png"
+	"fmt"
+	"image"
+	"image/draw"
+	"os"
+	// Used only to initialize the JPEG subsystem
+	_ "image/jpeg"
+	// Used only to initialize the PNG subsystem
+	_ "image/png"
 
-"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/gl/v4.1-core/gl"
 )
 
 // Texture a representation of an image file in memory

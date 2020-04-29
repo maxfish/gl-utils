@@ -37,4 +37,3 @@ func (c *Color) B() float32 {
 func (c *Color) A() float32 {
 	return c[3]
 }
-

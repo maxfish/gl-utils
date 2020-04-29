@@ -2,10 +2,10 @@ package gl_utils
 
 import (
 	"errors"
-"math"
+	"math"
 
-"github.com/go-gl/mathgl/mgl32"
-"github.com/go-gl/mathgl/mgl64"
+	"github.com/go-gl/mathgl/mgl32"
+	"github.com/go-gl/mathgl/mgl64"
 )
 
 // CircleToPolygon approximate a circle shape with a regular polygon
@@ -74,4 +74,3 @@ func Mat4From64to32Bits(mat mgl64.Mat4) mgl32.Mat4 {
 		float32(mat[15]),
 	}
 }
-

@@ -1,4 +1,4 @@
-# go-gl-utils
+# gl-utils
 Some utility functions to deal with common OpenGL tasks.
 
 Uses _OpenGL - Core Profile 4.1_ (aka "modern OpenGL") since it's the latest version supported by MacOS. 
