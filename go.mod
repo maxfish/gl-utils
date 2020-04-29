@@ -1,4 +1,4 @@
-module github.com/maxfish/go-gl-utils
+module github.com/maxfish/gl_utils
 
 go 1.14
 
