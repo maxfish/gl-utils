@@ -6,9 +6,6 @@ import (
 	"math"
 )
 
-const MinZoom float64 = 0.01
-const MaxZoom float64 = 20
-
 // Camera2D a Camera based on an orthogonal projection
 type Camera2D struct {
 	x                  float64
@@ -18,6 +15,8 @@ type Camera2D struct {
 	height             float64
 	halfHeight         float64
 	zoom               float64
+	minZoom            float64
+	maxZoom            float64
 	centered           bool
 	flipVertical       bool
 	near               float64
@@ -36,6 +35,8 @@ func NewCamera2D(width int, height int, zoom float64) *Camera2D {
 		height:     float64(height),
 		halfHeight: float64(height) / 2,
 		zoom:       zoom,
+		minZoom:    0.01,
+		maxZoom:    20,
 	}
 	c.far = -2
 	c.near = 2
@@ -78,15 +79,28 @@ func (c *Camera2D) Translate(x float64, y float64) {
 }
 
 // Zoom returns the current zoom level
-func (c *Camera2D) Zoom() float64 {
-	return c.zoom
-}
+func (c *Camera2D) Zoom() float64 { return c.zoom }
 
 // SetZoom sets the zoom factor
 func (c *Camera2D) SetZoom(zoom float64) {
-	zoom = mgl64.Clamp(zoom, MinZoom, MaxZoom)
+	zoom = mgl64.Clamp(zoom, c.minZoom, c.maxZoom)
 	c.zoom = zoom
 	c.matrixDirty = true
+}
+
+// MinZoom returns the minimum zoom level allowed
+func (c *Camera2D) MinZoom() float64 { return c.minZoom }
+
+// MaxZoom returns the maximum zoom level allowed
+func (c *Camera2D) MaxZoom() float64 { return c.maxZoom }
+
+// SetZoomRange sets the minimum and maximum zoom factors allowed
+func (c *Camera2D) SetZoomRange(minZoom float64, maxZoom float64) {
+	c.minZoom = minZoom
+	c.maxZoom = maxZoom
+	if c.zoom > c.maxZoom || c.zoom < c.minZoom {
+		c.SetZoom(c.zoom)
+	}
 }
 
 // SetCentered sets the center of the camera to the center of the screen
