@@ -292,6 +292,40 @@ func NewPolylinePrimitive(center mgl64.Vec3, points []mgl64.Vec2, closed bool) *
 	return primitive
 }
 
+//  Creates a grid of lines with a distance of gridSize and filling the area 0,0 -> width,height
+func NewGridPrimitive(center mgl64.Vec3, width int, height int, gridSize int) *Primitive2D {
+	primitive := &Primitive2D{
+		position: center,
+		size:     mgl64.Vec2{1, 1},
+		scale:    mgl64.Vec2{1, 1},
+	}
+	primitive.shaderProgram = NewShaderProgram(VertexShaderBase, "", FragmentShaderSolidColor)
+	primitive.rebuildMatrices()
+
+	var w = width + gridSize;
+	var h = height + gridSize;
+	var numRows = height/gridSize
+	var numColumns = width/gridSize
+	var ox = -width/2
+	var oy = -height/2
+
+	var numVertices int32 = int32(numRows) * 2 + int32(numColumns)
+	vertices := make([]float32, 0, numVertices*2)
+	for i:=0;i<h / gridSize + 1; i++ {
+		vertices = append(vertices, float32(ox), float32(oy+i *gridSize))
+		vertices = append(vertices, float32(ox + w), float32(oy+i *gridSize))
+	}
+	for i:=0;i<w / gridSize + 1; i++ {
+		vertices = append(vertices, float32(ox+i*gridSize), float32(oy))
+		vertices = append(vertices, float32(ox+i*gridSize), float32(oy+h))
+	}
+
+	primitive.arrayMode = gl.LINES
+	primitive.arraySize = numVertices
+	primitive.SetVertices(vertices)
+	return primitive
+}
+
 // SetVertices uploads new set of vertices into opengl buffer
 func (p *Primitive2D) SetVertices(vertices []float32) {
 	if p.vaoId == 0 {
