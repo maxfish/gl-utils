@@ -2,11 +2,11 @@ package gl_utils
 
 import (
 	"fmt"
+	"github.com/go-gl/mathgl/mgl64"
 	"strings"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
-	"github.com/go-gl/mathgl/mgl64"
 )
 
 // ShaderType Type of the shader
