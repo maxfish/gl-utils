@@ -112,6 +112,11 @@ func (p *Primitive2D) SetFlipY(flipY bool) {
 	p.rebuildScaleMatrix()
 }
 
+// Color return the color passed to the shader
+func (p *Primitive2D) Color() Color {
+	return p.color
+}
+
 // SetColor sets the color passed to the shader
 func (p *Primitive2D) SetColor(color Color) {
 	p.color = color
