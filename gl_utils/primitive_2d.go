@@ -177,19 +177,31 @@ func (p *Primitive2D) ModelMatrix() *mgl32.Mat4 {
 
 // NewQuadPrimitive creates a rectangular primitive filled with a texture
 func NewQuadPrimitive(position mgl32.Vec3, size mgl32.Vec2) *Primitive2D {
+	shader := NewShaderProgram(VertexShaderBase, "", FragmentShaderTexture)
+	return NewQuadPrimitiveExt(position, size, shader, nil, nil)
+}
+
+// NewQuadPrimitiveExt creates a rectangular primitive filled with a texture. It accepts custom shader and coordinates
+func NewQuadPrimitiveExt(position mgl32.Vec3, size mgl32.Vec2, shader *ShaderProgram, vertices []float32, uvCoords []float32) *Primitive2D {
 	q := &Primitive2D{
 		position: position,
 		size:     size,
 		scale:    mgl32.Vec2{1, 1},
 	}
-	q.shaderProgram = NewShaderProgram(VertexShaderBase, "", FragmentShaderTexture)
+	q.shaderProgram = shader
 	q.rebuildMatrices()
 	q.arrayMode = gl.TRIANGLE_FAN
 	q.arraySize = 4
 
 	// Build the VAO
-	q.SetVertices([]float32{0, 0, 0, 1, 1, 1, 1, 0})
-	q.SetUVCoords([]float32{0, 0, 0, 1, 1, 1, 1, 0})
+	if vertices == nil {
+		vertices = []float32{0, 0, 0, 1, 1, 1, 1, 0}
+	}
+	if uvCoords == nil {
+		uvCoords = []float32{0, 0, 0, 1, 1, 1, 1, 0}
+	}
+	q.SetVertices(vertices)
+	q.SetUVCoords(uvCoords)
 	return q
 }
 
