@@ -175,7 +175,7 @@ func (p *Primitive2D) ModelMatrix() *mgl32.Mat4 {
 	return &p.modelMatrix.Mat4
 }
 
-// NewQuadPrimitive creates a rectangular primitive
+// NewQuadPrimitive creates a rectangular primitive filled with a texture
 func NewQuadPrimitive(position mgl32.Vec3, size mgl32.Vec2) *Primitive2D {
 	q := &Primitive2D{
 		position: position,
@@ -193,21 +193,25 @@ func NewQuadPrimitive(position mgl32.Vec3, size mgl32.Vec2) *Primitive2D {
 	return q
 }
 
-// NewQuadPrimitive creates a rectangular primitive
-func NewQuadPrimitive(position mgl32.Vec3, size mgl32.Vec2) *Primitive2D {
+// NewRectPrimitive creates a rectangular primitive
+func NewRectPrimitive(position mgl32.Vec3, size mgl32.Vec2, filled bool) *Primitive2D {
 	q := &Primitive2D{
 		position: position,
 		size:     size,
 		scale:    mgl32.Vec2{1, 1},
 	}
-	q.shaderProgram = NewShaderProgram(VertexShaderBase, "", FragmentShaderTexture)
+	q.shaderProgram = NewShaderProgram(VertexShaderBase, "", FragmentShaderSolidColor)
 	q.rebuildMatrices()
-	q.arrayMode = gl.TRIANGLE_FAN
-	q.arraySize = 4
 
-	// Build the VAO
-	q.SetVertices([]float32{0, 0, 0, 1, 1, 1, 1, 0})
-	q.SetUVCoords([]float32{0, 0, 0, 1, 1, 1, 1, 0})
+	if filled {
+		q.arrayMode = gl.TRIANGLE_FAN
+		q.arraySize = 4
+		q.SetVertices([]float32{0, 0, 0, 1, 1, 1, 1, 0})
+	} else {
+		q.arrayMode = gl.LINE_STRIP
+		q.arraySize = 5
+		q.SetVertices([]float32{0, 0, 0, 1, 1, 1, 1, 0, 0, 0})
+	}
 	return q
 }
 
