@@ -39,24 +39,10 @@ func NewTextureFromFile(filePath string) *Texture {
 
 // NewTextureFromImage uses the data from an Image struct to create a texture
 func NewTextureFromImage(imageData image.Image) *Texture {
-	switch imageData.(type) {
-	case *image.RGBA:
-	default:
-		rgba := image.NewRGBA(imageData.Bounds())
-		if rgba.Stride != rgba.Rect.Size().X*4 {
-			fmt.Println("Error creating texture: unsupported stride")
-			return nil
-		}
-		draw.Draw(rgba, rgba.Bounds(), imageData, image.Point{0, 0}, draw.Src)
-		imageData = rgba
-	}
-
 	texture := &Texture{
 		width:  int32(imageData.Bounds().Dx()),
 		height: int32(imageData.Bounds().Dy()),
 	}
-	pixelData := imageData.(*image.RGBA).Pix
-
 	gl.GenTextures(1, &texture.id)
 	gl.ActiveTexture(gl.TEXTURE0)
 	gl.BindTexture(gl.TEXTURE_2D, texture.id)
@@ -64,10 +50,41 @@ func NewTextureFromImage(imageData image.Image) *Texture {
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-	gl.TexImage2D(
-		gl.TEXTURE_2D, 0, gl.RGBA, texture.width, texture.height,
-		0, gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(pixelData),
-	)
+
+	switch imageData.(type) {
+	case *image.Gray16:
+		// 16-bit monochrome image --> Gray
+		grayImage := image.NewGray(imageData.Bounds())
+		if grayImage.Stride != grayImage.Rect.Size().X*1 {
+			fmt.Println("Error creating texture: unsupported stride")
+			return nil
+		}
+		draw.Draw(grayImage, grayImage.Bounds(), imageData, image.Point{0, 0}, draw.Src)
+		gl.TexImage2D(
+			gl.TEXTURE_2D, 0, gl.RED, texture.width, texture.height,
+			0, gl.RED, gl.UNSIGNED_BYTE, gl.Ptr(grayImage.Pix),
+		)
+	case *image.NRGBA:
+		// non-alpha-premultiplied 32-bit color image --> RGBA
+		pixelData := imageData.(*image.NRGBA).Pix
+		gl.TexImage2D(
+			gl.TEXTURE_2D, 0, gl.RGBA, texture.width, texture.height,
+			0, gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(pixelData),
+		)
+	default:
+		// All the other formats -->  RGBA
+		rgba := image.NewRGBA(imageData.Bounds())
+		if rgba.Stride != rgba.Rect.Size().X*4 {
+			fmt.Println("Error creating texture: unsupported stride")
+			return nil
+		}
+		draw.Draw(rgba, rgba.Bounds(), imageData, image.Point{0, 0}, draw.Src)
+		gl.TexImage2D(
+			gl.TEXTURE_2D, 0, gl.RGBA, texture.width, texture.height,
+			0, gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(rgba.Pix),
+		)
+	}
+
 	gl.BindTexture(gl.TEXTURE_2D, 0)
 
 	return texture
